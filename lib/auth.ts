@@ -13,6 +13,26 @@ export const authOptions: AuthOptions = {
     ],
     session: { strategy: "database" },
     secret: process.env.NEXTAUTH_SECRET,
+
+    events: {
+        async createUser({ user }) {
+            if (user.email) {
+                const usernameBase = (user.name || user.email.split("@")[0])
+                    .toLowerCase()
+                    .replace(/[^a-z0-9]/g, "");
+                const username = usernameBase + Date.now().toString().slice(-4);
+                await prisma.profile.create({
+                    data: {
+                        userId: user.id,
+                        username: username,
+                        avatar: user.image,
+                        description: "Welcome to my LinkHub page!",
+                    },
+                });
+            }
+        },
+    },
+
     callbacks: {
         async session({ session, user }) {
             // Этот коллбэк по-прежнему нужен, чтобы добавлять наш ID в сессию.
