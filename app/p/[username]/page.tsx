@@ -1,25 +1,22 @@
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { auth } from "@/lib/auth"; // <-- ИМПОРТ
 import { getPublicProfile } from "@/lib/actions";
 import LinkButton from "@/components/ui/LinkButton";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 
-export default async function UserPage({
-    params,
-}: {
-    params: Promise<{ username: string }>;
-}) {
-    // 1. "Распаковываем" Promise, чтобы получить реальный объект params
-    const resolvedParams = await params;
-    const username = resolvedParams.username;
+interface UserPageProps {
+    params: { username: string };
+    searchParams: { [key: string]: string | string[] | undefined };
+}
 
-    // 2. Вся остальная логика остается прежней
+export default async function UserPage({ params }: UserPageProps) {
+    const { username } = params;
+
     const [profile, session] = await Promise.all([
         getPublicProfile(username),
-        getServerSession(authOptions),
+        auth(), // <-- СПОСОБ ПОЛУЧИТЬ СЕССИЮ
     ]);
 
     if (!profile) {
