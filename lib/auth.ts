@@ -1,5 +1,5 @@
 import type { AuthOptions } from "next-auth";
-import { PrismaAdapter } from "@auth/prisma-adapter";
+import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { prisma } from "./prisma";
 import GitHubProvider from "next-auth/providers/github";
 
@@ -11,10 +11,8 @@ export const authOptions: AuthOptions = {
             clientSecret: process.env.GITHUB_CLIENT_SECRET as string,
         }),
     ],
-    session: {
-        strategy: "database",
-    },
-    secret: process.env.AUTH_SECRET,
+    session: { strategy: "database" },
+    secret: process.env.NEXTAUTH_SECRET,
     events: {
         async createUser({ user }) {
             if (user.email) {
