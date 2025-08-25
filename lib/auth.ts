@@ -15,6 +15,7 @@ export const authOptions: AuthOptions = {
     secret: process.env.NEXTAUTH_SECRET,
     events: {
         async createUser({ user }) {
+            // Этот ивент срабатывает ПОСЛЕ успешного создания User в signIn
             if (user.email) {
                 const usernameBase = (user.name || user.email.split("@")[0])
                     .toLowerCase()
@@ -38,5 +39,10 @@ export const authOptions: AuthOptions = {
             }
             return session;
         },
+    },
+    // --- ДОБАВЛЯЕМ ЭТУ СЕКЦИЮ ДЛЯ ОТЛАДКИ ---
+    debug: true,
+    pages: {
+        error: "/api/auth/error", // Убедимся, что он использует стандартную страницу
     },
 };
