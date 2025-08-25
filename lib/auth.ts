@@ -13,6 +13,25 @@ export const authOptions: AuthOptions = {
     ],
     session: { strategy: "database" },
     secret: process.env.NEXTAUTH_SECRET,
+    cookies: {
+        state: {
+            name: "next-auth.state",
+            options: {
+                httpOnly: true,
+                sameSite: "lax",
+                path: "/",
+                secure: process.env.NODE_ENV === "production",
+            },
+        },
+        callbackUrl: {
+            name: `next-auth.callback-url`,
+            options: {
+                sameSite: "lax",
+                path: "/",
+                secure: process.env.NODE_ENV === "production",
+            },
+        },
+    },
     events: {
         async createUser({ user }) {
             // Этот ивент срабатывает ПОСЛЕ успешного создания User в signIn
@@ -41,7 +60,6 @@ export const authOptions: AuthOptions = {
         },
     },
     // --- ДОБАВЛЯЕМ ЭТУ СЕКЦИЮ ДЛЯ ОТЛАДКИ ---
-    debug: true,
     pages: {
         error: "/api/auth/error", // Убедимся, что он использует стандартную страницу
     },

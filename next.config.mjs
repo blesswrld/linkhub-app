@@ -1,3 +1,8 @@
+import dotenv from "dotenv";
+
+// Принудительно загружаем переменные из .env файла
+dotenv.config();
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
     // Добавляем этот блок для настройки изображений

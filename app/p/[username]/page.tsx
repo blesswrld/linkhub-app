@@ -6,26 +6,46 @@ import { authOptions } from "@/lib/auth";
 import { getPublicProfile } from "@/lib/actions";
 import LinkButton from "@/components/ui/LinkButton";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import { Profile } from "@/types";
 
 interface UserPageProps {
     params: { username: string };
     searchParams: { [key: string]: string | string[] | undefined };
 }
 
+// Создаем объект с демо-данными
+const demoProfile: Profile = {
+    id: "demo-user",
+    username: "elonmusk",
+    avatar: "https://i.pravatar.cc/150?u=elonmusk",
+    description: "CEO of SpaceX & Tesla. This is a demo profile.",
+    theme: "dark-pro",
+    links: [
+        { id: "1", title: "SpaceX", url: "https://www.spacex.com/" },
+        { id: "2", title: "Tesla", url: "https://www.tesla.com/" },
+        { id: "3", title: "X (Twitter)", url: "https://twitter.com/elonmusk" },
+    ],
+};
+
 export default async function UserPage({ params }: UserPageProps) {
     const { username } = params;
+    let profile: Profile | null = null;
 
-    const [profile, session] = await Promise.all([
-        getPublicProfile(username),
-        getServerSession(authOptions),
-    ]);
+    if (username === "elonmusk") {
+        profile = demoProfile;
+    } else {
+        // Для всех остальных username ищем в базе данных
+        profile = await getPublicProfile(username);
+    }
+
+    const session = await getServerSession(authOptions);
 
     if (!profile) {
         notFound();
     }
 
     const userId = session?.user?.id;
-    const isOwner = !!userId && userId === profile.userId;
+    const isOwner = !!userId && userId === (profile as any).userId; // `as any` чтобы TS не ругался на отсутствие userId у демо
     const themeClass = `theme-${profile.theme || "default"}`;
 
     return (
