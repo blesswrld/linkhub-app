@@ -1,0 +1,105 @@
+@import "tailwindcss";
+
+/* Тема по умолчанию (Светлая). 
+Она будет работать всегда. */
+:root,
+.theme-default {
+    --page-bg: #f3f4f6;
+    --text-primary: #111827;
+    --text-secondary: #4b5563;
+    --button-bg: #e5e7eb;
+    --button-bg-hover: #d1d5db;
+    --button-text: #1f2937;
+    --brand-text: #4b5563;
+}
+
+/* Другие темы просто переопределяют эти переменные */
+.theme-dark-pro {
+    --page-bg: #111827;
+    --text-primary: #f9fafb;
+    --text-secondary: #9ca3af;
+    --button-bg: #374151;
+    --button-bg-hover: #4b5563;
+    --button-text: #f9fafb;
+    --brand-text: #9ca3af;
+}
+
+.theme-mint {
+    --page-bg: #f0fdf4;
+    --text-primary: #14532d;
+    --text-secondary: #166534;
+    --button-bg: #bbf7d0;
+    --button-bg-hover: #86efac;
+    --button-text: #14532d;
+    --brand-text: #16a34a;
+}
+
+.theme-peach {
+    --page-bg: #fff7ed;
+    --text-primary: #7c2d12;
+    --text-secondary: #9a3412;
+    --button-bg: #fed7aa;
+    --button-bg-hover: #fdba74;
+    --button-text: #7c2d12;
+    --brand-text: #ea580c;
+}
+
+.theme-forest {
+    --page-bg: #f0fdf4;
+    --text-primary: #052e16;
+    --text-secondary: #15803d;
+    --button-bg: #bbf7d0;
+    --button-bg-hover: #86efac;
+    --button-text: #052e16;
+    --brand-text: #15803d;
+}
+
+.theme-ocean {
+    --page-bg: #f0f9ff;
+    --text-primary: #172554;
+    --text-secondary: #1d4ed8;
+    --button-bg: #bfdbfe;
+    --button-bg-hover: #93c5fd;
+    --button-text: #172554;
+    --brand-text: #1d4ed8;
+}
+
+.theme-sunset {
+    --page-bg: #fff7ed;
+    --text-primary: #7c2d12;
+    --text-secondary: #c2410c;
+    --button-bg: #fed7aa;
+    --button-bg-hover: #fdba74;
+    --button-text: #7c2d12;
+    --brand-text: #c2410c;
+}
+
+.theme-royal {
+    --page-bg: #f5f3ff;
+    --text-primary: #2e1065;
+    --text-secondary: #6d28d9;
+    --button-bg: #ddd6fe;
+    --button-bg-hover: #c4b5fd;
+    --button-text: #2e1065;
+    --brand-text: #6d28d9;
+}
+
+.theme-monochrome {
+    --page-bg: #ffffff;
+    --text-primary: #000000;
+    --text-secondary: #6b7280;
+    --button-bg: #f3f4f6;
+    --button-bg-hover: #e5e7eb;
+    --button-text: #000000;
+    --brand-text: #6b7280;
+}
+
+.theme-sakura {
+    --page-bg: #fdf2f8;
+    --text-primary: #881337;
+    --text-secondary: #be185d;
+    --button-bg: #fbcfe8;
+    --button-bg-hover: #f9a8d4;
+    --button-text: #881337;
+    --brand-text: #be185d;
+}
