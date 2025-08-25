@@ -6,7 +6,49 @@ import { authOptions } from "./auth";
 import { prisma } from "./prisma";
 import { LinkData } from "@/types";
 
-// --- Helper-функция для проверки прав доступа ---
+// Эта функция теперь не падает, а СОЗДАЕТ профиль, если его нет.
+export async function getDashboardData() {
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.id) {
+        throw new Error("Not authenticated");
+    }
+
+    const userId = session.user.id;
+    let profile = await prisma.profile.findUnique({
+        where: { userId },
+        include: {
+            links: { orderBy: { order: "asc" } },
+        },
+    });
+
+    // Если профиль не найден - создаем его!
+    if (!profile) {
+        const user = session.user;
+        const usernameBase = (
+            user.name ||
+            user.email?.split("@")[0] ||
+            `user${userId.slice(0, 4)}`
+        )
+            .toLowerCase()
+            .replace(/[^a-z0-9]/g, "");
+        const username = usernameBase + Date.now().toString().slice(-4);
+
+        profile = await prisma.profile.create({
+            data: {
+                userId: userId,
+                username: username,
+                avatar: user.image,
+                description: "Welcome to my LinkHub page!",
+                theme: "default",
+                links: { create: [] }, // Создаем с пустым массивом ссылок
+            },
+            include: { links: true },
+        });
+    }
+
+    return profile;
+}
+
 async function getProfileForCurrentUser() {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) throw new Error("Not authenticated");
@@ -20,17 +62,6 @@ async function getProfileForCurrentUser() {
 }
 
 // --- ФУНКЦИИ, КОТОРЫЕ ИСПОЛЬЗУЮТСЯ В ПРИЛОЖЕНИИ ---
-
-export async function getDashboardData() {
-    const profile = await getProfileForCurrentUser();
-    const links = await prisma.link.findMany({
-        where: { profileId: profile.id },
-        orderBy: { order: "asc" },
-    });
-
-    return { ...profile, links };
-}
-
 export async function addLink(formData: { title: string; url: string }) {
     const profile = await getProfileForCurrentUser();
 
