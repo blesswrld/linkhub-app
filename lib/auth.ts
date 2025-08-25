@@ -14,6 +14,8 @@ export const authOptions: AuthOptions = {
     session: { strategy: "database" },
     secret: process.env.NEXTAUTH_SECRET,
 
+    useSecureCookies: process.env.NODE_ENV === "production",
+
     events: {
         async createUser({ user }) {
             if (user.email) {
