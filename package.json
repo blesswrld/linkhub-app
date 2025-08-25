@@ -10,6 +10,7 @@
         "postinstall": "prisma generate"
     },
     "dependencies": {
+        "@auth/core": "^0.40.0",
         "@auth/prisma-adapter": "^1.6.0",
         "@emotion/react": "^11.11.4",
         "@emotion/styled": "^11.11.5",
