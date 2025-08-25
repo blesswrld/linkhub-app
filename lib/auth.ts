@@ -1,19 +1,18 @@
-import NextAuth from "next-auth";
-import GitHub from "next-auth/providers/github";
+import type { AuthOptions } from "next-auth";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { prisma } from "./prisma";
+import GitHubProvider from "next-auth/providers/github";
 
-export const { handlers, auth, signIn, signOut } = NextAuth({
+export const authOptions: AuthOptions = {
     adapter: PrismaAdapter(prisma),
     providers: [
-        // ВОЗВРАЩАЕМ ЯВНУЮ ПЕРЕДАЧУ КЛЮЧЕЙ
-        GitHub({
-            clientId: process.env.GITHUB_CLIENT_ID ?? "",
-            clientSecret: process.env.GITHUB_CLIENT_SECRET ?? "",
+        GitHubProvider({
+            clientId: process.env.GITHUB_CLIENT_ID as string,
+            clientSecret: process.env.GITHUB_CLIENT_SECRET as string,
         }),
     ],
     session: {
-        strategy: "jwt",
+        strategy: "database",
     },
     secret: process.env.AUTH_SECRET,
     events: {
@@ -42,4 +41,4 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             return session;
         },
     },
-});
+};

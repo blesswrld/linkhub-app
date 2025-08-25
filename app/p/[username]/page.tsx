@@ -1,7 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { auth } from "@/lib/auth"; // <-- ИМПОРТ
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 import { getPublicProfile } from "@/lib/actions";
 import LinkButton from "@/components/ui/LinkButton";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
@@ -16,7 +17,7 @@ export default async function UserPage({ params }: UserPageProps) {
 
     const [profile, session] = await Promise.all([
         getPublicProfile(username),
-        auth(), // <-- СПОСОБ ПОЛУЧИТЬ СЕССИЮ
+        getServerSession(authOptions),
     ]);
 
     if (!profile) {

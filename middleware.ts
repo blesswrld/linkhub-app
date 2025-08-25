@@ -1,4 +1,6 @@
-export { auth as middleware } from "@/lib/auth";
+import { withAuth } from "next-auth/middleware";
+
+export default withAuth();
 
 export const config = {
     matcher: ["/admin/:path*"],

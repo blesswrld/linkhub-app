@@ -1,13 +1,14 @@
 "use server";
 
+import { getServerSession } from "next-auth";
 import { revalidatePath } from "next/cache";
-import { auth } from "./auth"; // <-- импорт для сессии
+import { authOptions } from "./auth";
 import { prisma } from "./prisma";
 import { LinkData } from "@/types";
 
 // --- Helper-функция для проверки прав доступа ---
 async function getProfileForCurrentUser() {
-    const session = await auth(); // <-- правильный способ получить сессию
+    const session = await getServerSession(authOptions);
     if (!session?.user?.id) throw new Error("Not authenticated");
 
     const profile = await prisma.profile.findUnique({
@@ -21,12 +22,10 @@ async function getProfileForCurrentUser() {
 // --- ФУНКЦИИ, КОТОРЫЕ ИСПОЛЬЗУЮТСЯ В ПРИЛОЖЕНИИ ---
 
 export async function getDashboardData() {
-    const profile = await getProfileForCurrentUser(); // Используем нашу helper-функцию
-
-    // Получаем связанные ссылки отдельно, чтобы убедиться, что профиль существует
+    const profile = await getProfileForCurrentUser();
     const links = await prisma.link.findMany({
         where: { profileId: profile.id },
-        orderBy: { order: "asc" }, // Сортируем по полю order
+        orderBy: { order: "asc" },
     });
 
     return { ...profile, links };
@@ -66,7 +65,6 @@ export async function updateLink(linkData: LinkData) {
             thumbnailUrl: linkData.thumbnailUrl,
         },
     });
-
     revalidatePath("/admin");
     revalidatePath(`/p/${profile.username}`);
 }
