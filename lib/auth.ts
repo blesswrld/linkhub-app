@@ -19,7 +19,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     events: {
         async createUser({ user }) {
             if (user.email) {
-                const usernameBase = (user.name || user.email.split("@")[0])
+                const usernameBase = (
+                    user.name ||
+                    user.email?.split("@")[0] ||
+                    "user"
+                )
                     .toLowerCase()
                     .replace(/[^a-z0-9]/g, "");
                 const username = usernameBase + Date.now().toString().slice(-4);
