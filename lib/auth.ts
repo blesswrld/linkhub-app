@@ -1,21 +1,18 @@
-import type { AuthOptions } from "next-auth";
-import { PrismaAdapter } from "@next-auth/prisma-adapter";
+import NextAuth from "next-auth";
+import GitHub from "next-auth/providers/github";
+import { PrismaAdapter } from "@auth/prisma-adapter";
 import { prisma } from "./prisma";
-import GitHubProvider from "next-auth/providers/github";
 
-export const authOptions: AuthOptions = {
+export const { handlers, auth, signIn, signOut } = NextAuth({
     adapter: PrismaAdapter(prisma),
     providers: [
-        GitHubProvider({
-            clientId: process.env.GITHUB_CLIENT_ID as string,
-            clientSecret: process.env.GITHUB_CLIENT_SECRET as string,
+        GitHub({
+            clientId: process.env.GITHUB_CLIENT_ID,
+            clientSecret: process.env.GITHUB_CLIENT_SECRET,
         }),
     ],
     session: { strategy: "database" },
-    secret: process.env.NEXTAUTH_SECRET,
-
-    useSecureCookies: process.env.NODE_ENV === "production",
-
+    secret: process.env.AUTH_SECRET, // <-- V5 использует AUTH_SECRET
     events: {
         async createUser({ user }) {
             if (user.email) {
@@ -44,4 +41,4 @@ export const authOptions: AuthOptions = {
             return session;
         },
     },
-};
+});

@@ -1,14 +1,26 @@
 "use server";
 
-import { getServerSession } from "next-auth";
 import { revalidatePath } from "next/cache";
-import { authOptions } from "./auth";
+import { auth } from "./auth"; // <-- ПРАВИЛЬНЫЙ ИМПОРТ ДЛЯ V5
 import { prisma } from "./prisma";
 import { LinkData } from "@/types";
 
+// Helper-функция, которая теперь использует auth() из V5
+async function getProfileForCurrentUser() {
+    const session = await auth();
+    if (!session?.user?.id) throw new Error("Not authenticated");
+
+    const profile = await prisma.profile.findUnique({
+        where: { userId: session.user.id },
+    });
+    if (!profile) throw new Error("Profile not found");
+
+    return profile;
+}
+
 // Эта функция теперь не падает, а СОЗДАЕТ профиль, если его нет.
 export async function getDashboardData() {
-    const session = await getServerSession(authOptions);
+    const session = await auth();
     if (!session?.user?.id) {
         throw new Error("Not authenticated");
     }
@@ -21,7 +33,6 @@ export async function getDashboardData() {
         },
     });
 
-    // Если профиль не найден - создаем его!
     if (!profile) {
         const user = session.user;
         const usernameBase = (
@@ -40,23 +51,11 @@ export async function getDashboardData() {
                 avatar: user.image,
                 description: "Welcome to my LinkHub page!",
                 theme: "default",
-                links: { create: [] }, // Создаем с пустым массивом ссылок
+                links: { create: [] },
             },
             include: { links: true },
         });
     }
-
-    return profile;
-}
-
-async function getProfileForCurrentUser() {
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.id) throw new Error("Not authenticated");
-
-    const profile = await prisma.profile.findUnique({
-        where: { userId: session.user.id },
-    });
-    if (!profile) throw new Error("Profile not found");
 
     return profile;
 }
