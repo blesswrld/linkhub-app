@@ -12,7 +12,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         }),
     ],
     session: { strategy: "database" },
-    secret: process.env.AUTH_SECRET, // <-- V5 использует AUTH_SECRET
+    secret: process.env.NEXTAUTH_SECRET,
     events: {
         async createUser({ user }) {
             if (user.email) {
