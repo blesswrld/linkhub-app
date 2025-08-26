@@ -1,8 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { auth } from "@/lib/auth"; // <-- ПРАВИЛЬНЫЙ ИМПОРТ ДЛЯ V5
 import { getPublicProfile } from "@/lib/actions";
 import LinkButton from "@/components/ui/LinkButton";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
@@ -14,7 +13,7 @@ interface UserPageProps {
 }
 
 // Создаем объект с демо-данными
-const demoProfile: Profile = {
+const demoProfile: Profile & { userId?: string } = {
     id: "demo-user",
     username: "elonmusk",
     avatar: "https://i.pravatar.cc/150?u=elonmusk",
@@ -29,23 +28,24 @@ const demoProfile: Profile = {
 
 export default async function UserPage({ params }: UserPageProps) {
     const { username } = params;
-    let profile: Profile | null = null;
 
-    if (username === "elonmusk") {
-        profile = demoProfile;
-    } else {
-        // Для всех остальных username ищем в базе данных
-        profile = await getPublicProfile(username);
-    }
+    // `Promise.all` для параллельного выполнения запросов
+    const [profileResult, session] = await Promise.all([
+        username === "elonmusk"
+            ? Promise.resolve(demoProfile)
+            : getPublicProfile(username),
+        auth(), // <-- ПРАВИЛЬНЫЙ СПОСОБ ПОЛУЧИТЬ СЕССИЮ В V5
+    ]);
 
-    const session = await getServerSession(authOptions);
+    const profile = profileResult;
 
     if (!profile) {
         notFound();
     }
 
     const userId = session?.user?.id;
-    const isOwner = !!userId && userId === (profile as any).userId; // `as any` чтобы TS не ругался на отсутствие userId у демо
+    const isOwner =
+        !!userId && "userId" in profile && userId === profile.userId;
     const themeClass = `theme-${profile.theme || "default"}`;
 
     return (
