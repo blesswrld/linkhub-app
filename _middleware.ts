@@ -11,31 +11,30 @@ export function middleware(req: NextRequest) {
         "__Secure-authjs.pkce.code_verifier",
     ];
 
-    let shouldRedirect = false;
+    const res = NextResponse.redirect(new URL("/admin", req.url));
 
-    // Проверяем каждый cookie
+    // Принудительно удаляем все служебные куки
     authCookies.forEach((name) => {
-        const value = req.cookies.get(name)?.value;
-        if (value && !value.startsWith("https://linkhub-red.vercel.app")) {
-            shouldRedirect = true;
-        }
+        res.cookies.set(name, "", { maxAge: -1, path: "/" });
     });
 
-    if (shouldRedirect) {
-        const res = NextResponse.redirect(new URL("/admin", req.url));
+    // Ставим корректный callback-url для новой сессии
+    res.cookies.set(
+        "__Secure-authjs.callback-url",
+        "https://linkhub-red.vercel.app/admin",
+        {
+            path: "/",
+            httpOnly: true,
+            sameSite: "lax",
+            secure: true,
+        }
+    );
 
-        // Удаляем все служебные authjs cookies
-        authCookies.forEach((name) => {
-            res.cookies.set(name, "", { maxAge: -1, path: "/" });
-        });
+    console.log(
+        "[middleware] очищены старые authjs-куки и установлен новый callback-url"
+    );
 
-        console.warn(
-            "[middleware] очищены старые authjs-куки и выполнен редирект на /admin"
-        );
-        return res;
-    }
-
-    return NextResponse.next();
+    return res;
 }
 
 export const config = {

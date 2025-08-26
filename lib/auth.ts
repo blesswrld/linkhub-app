@@ -7,12 +7,15 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     adapter: PrismaAdapter(prisma),
     providers: [
         GitHub({
-            clientId: process.env.GITHUB_CLIENT_ID,
-            clientSecret: process.env.GITHUB_CLIENT_SECRET,
+            clientId: process.env.GITHUB_CLIENT_ID!,
+            clientSecret: process.env.GITHUB_CLIENT_SECRET!,
         }),
     ],
-    session: { strategy: "database" },
     secret: process.env.AUTH_SECRET,
+    session: { strategy: "database" },
+
+    useSecureCookies: process.env.NODE_ENV === "production",
+
     events: {
         async createUser({ user }) {
             if (user.email) {
